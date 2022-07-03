@@ -158,12 +158,7 @@ export class FloodFill {
     {
       const x = Math.round(originX);
       const y = Math.round(originY);
-      if (
-        x < 0 ||
-        x >= scalarField.dimX() ||
-        y < 0 ||
-        y >= scalarField.dimY()
-      ) {
+      if (!scalarField.isInside(x, y)) {
         return;
       }
       const fieldValue = scalarField.get(x, y);
@@ -179,18 +174,13 @@ export class FloodFill {
       const node = this.floodStack.pop();
       const x = node.x;
       const y = node.y;
-      if (
-        x < 0 ||
-        x >= scalarField.dimX() ||
-        y < 0 ||
-        y >= scalarField.dimY()
-      ) {
-        continue;
-      }
       scalarField.set(x, y, fillingValue);
       for (const delta of deltas) {
         const neighborX = x + delta.x;
         const neighborY = y + delta.y;
+        if (!scalarField.isInside(neighborX, neighborY)) {
+          continue;
+        }
         const fieldValue = scalarField.get(neighborX, neighborY);
         if (canFlood(fieldValue)) {
           const neighbor = this.nodeStock.getOrCreate(createNode);
@@ -255,34 +245,30 @@ export class FloodFill {
     originX: float,
     originY: float,
     getContourValue: GetContourValue
-  ) {
+  ): void {
     const scalarField = this.scalarField;
+    if (!scalarField.isInside(nodeX, nodeY)) {
+      return;
+    }
     // Avoid too big values
     const minDistanceSq = 1 / 1024 / 1024;
 
-    if (
-      nodeX >= 0 &&
-      nodeX < scalarField.dimX() &&
-      nodeY >= 0 &&
-      nodeY < scalarField.dimY()
-    ) {
-      const deltaX = nodeX - originX;
-      const deltaY = nodeY - originY;
-      const distanceSq = Math.max(
-        minDistanceSq,
-        deltaX * deltaX + deltaY * deltaY
-      );
-      const value = getContourValue(scalarField.get(nodeX, nodeY), distanceSq);
-      if (value !== null) {
-        scalarField.set(nodeX, nodeY, value);
-        const newNode = this.contourNodeStock.getOrCreate(createContourNode);
-        newNode.x = nodeX;
-        newNode.y = nodeY;
-        newNode.originX = originX;
-        newNode.originY = originY;
-        newNode.value = value;
-        this.nextContourStack.push(newNode);
-      }
+    const deltaX = nodeX - originX;
+    const deltaY = nodeY - originY;
+    const distanceSq = Math.max(
+      minDistanceSq,
+      deltaX * deltaX + deltaY * deltaY
+    );
+    const value = getContourValue(scalarField.get(nodeX, nodeY), distanceSq);
+    if (value !== null) {
+      scalarField.set(nodeX, nodeY, value);
+      const newNode = this.contourNodeStock.getOrCreate(createContourNode);
+      newNode.x = nodeX;
+      newNode.y = nodeY;
+      newNode.originX = originX;
+      newNode.originY = originY;
+      newNode.value = value;
+      this.nextContourStack.push(newNode);
     }
   }
 }

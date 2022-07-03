@@ -28,6 +28,35 @@ describe("FloodFill", function () {
 
   // This is not a representative case
   // because field are usually kind of continuous.
+  it("can fill the whole field", function () {
+    const scalarField = createScalarField([
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+    ]);
+
+    scalarField.fillFrom(4, 4, 1, 0, 1);
+
+    const a = 1;
+    expect(extractValues(scalarField)).to.eql([
+      [a, a, a, a, a, a, a, a],
+      [a, a, a, a, a, a, a, a],
+      [a, a, a, a, a, a, a, a],
+      [a, a, a, a, a, a, a, a],
+      [a, a, a, a, a, a, a, a],
+      [a, a, a, a, a, a, a, a],
+      [a, a, a, a, a, a, a, a],
+      [a, a, a, a, a, a, a, a],
+    ]);
+  });
+
+  // This is not a representative case
+  // because field are usually kind of continuous.
   it("can fill a square", function () {
     const scalarField = createScalarField([
       [0, 0, 0, 0, 0, 0, 0, 0],

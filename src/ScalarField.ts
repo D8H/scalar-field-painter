@@ -78,6 +78,10 @@ export class ScalarField {
     return firstColumn ? firstColumn.length : 0;
   }
 
+  isInside(x: float, y: float) {
+    return x >= 0 && x <= this.dimX() - 1 && y >= 0 && y <= this.dimY() - 1;
+  }
+
   get(x: integer, y: integer) {
     return this.values[y][x];
   }
