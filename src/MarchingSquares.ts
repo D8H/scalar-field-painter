@@ -250,10 +250,12 @@ export class MarchingSquares {
       let first15SquareX = -1;
 
       for (let squareX = minX; squareX < maxX - 1; squareX++) {
-        shapePainter.onFilledSquareChange(squareX, squareY);
         let squareIndex = this.getSquareIndex(squareX, squareY, threshold);
         if (drawUnder) {
           squareIndex = 15 - squareIndex;
+        }
+        if (squareIndex === 15) {
+          shapePainter.onFilledSquareChange(squareX, squareY);
         }
 
         if (first15SquareX === -1 && squareIndex === 15) {
