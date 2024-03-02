@@ -2,8 +2,8 @@ import { integer, float, MergingOperation } from "./CommonTypes";
 import { FloodFill } from "./FloodFill";
 
 /**
- * @param x1 {float} fist point x
- * @param y1 {float} fist point y
+ * @param x1 {float} first point x
+ * @param y1 {float} first point y
  * @param x2 {float} second point x
  * @param y2 {float} second point y
  * @return {float} the square distance between 2 points
@@ -107,8 +107,9 @@ export class ScalarField {
     if (
       squareX < 0 ||
       squareY < 0 ||
-      squareX >= this.dimX() ||
-      squareY >= this.dimY()
+      // - 1 because the extrapolation uses the next value.
+      squareX >= this.dimX() - 1 ||
+      squareY >= this.dimY() - 1
     ) {
       return 0;
     }
@@ -155,7 +156,7 @@ export class ScalarField {
   clamp(min: float, max: float) {
     for (let rowValues of this.values) {
       for (let x = 0; x < rowValues.length; x++) {
-        rowValues[x] = Math.max(Math.min(min, rowValues[x]), max);
+        rowValues[x] = Math.min(Math.max(min, rowValues[x]), max);
       }
     }
   }
@@ -179,10 +180,12 @@ export class ScalarField {
    * @param operation {function(float, float):float}
    */
   mergeField(scalarField: ScalarField, operation: MergingOperation) {
-    for (let y = 0; y < this.values.length; y++) {
+    const dimX = Math.min(this.dimX(), scalarField.dimX());
+    const dimY = Math.min(this.dimY(), scalarField.dimY());
+    for (let y = 0; y < dimY; y++) {
       const thisRowValues = this.values[y];
       const otherRowValues = scalarField.values[y];
-      for (let x = 0; x < thisRowValues.length; x++) {
+      for (let x = 0; x < dimX; x++) {
         thisRowValues[x] = operation(thisRowValues[x], otherRowValues[x]);
       }
     }
